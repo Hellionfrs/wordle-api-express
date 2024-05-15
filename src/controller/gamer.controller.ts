@@ -1,5 +1,9 @@
 import { NextFunction, Request, Response } from "express";
-import prisma from "../db/db";
+import {
+  createGamer,
+  findGamerByIp,
+  updateGamerStatus,
+} from "../services/gamer.service";
 
 export const createGamerController = async (
   req: Request,
@@ -12,17 +16,10 @@ export const createGamerController = async (
     // Devuelve la dirección IP en la respuesta JSON
     if (clientIp) {
       // Devolver la dirección IP en la respuesta JSON
-      let gamer = await prisma.gamer.findUnique({
-        where: { user_ip: clientIp },
-      });
+      let gamer = await findGamerByIp(clientIp);
 
       if (!gamer) {
-        gamer = await prisma.gamer.create({
-          data: {
-            user_ip: clientIp,
-            game_status: true,
-          },
-        });
+        gamer = await createGamer(clientIp);
       }
       res.json({ ok: true, gamer });
     } else {
@@ -45,16 +42,16 @@ export const updateGameStatusController = async (
   try {
     const clientIp = req.clientIp;
     const { game_status } = req.body;
-    if (!clientIp) {
-      res
-        .status(400)
-        .json({ ok: false, error: "No se pudo obtener la direccion IP" });
+
+    if (clientIp) {
+      const gamer = await updateGamerStatus(clientIp, game_status);
+      res.json({ ok: true, gamer });
+    } else {
+      res.status(400).json({
+        ok: false,
+        error: "No se pudo obtener la dirección IP del cliente",
+      });
     }
-    const gamer = await prisma.gamer.update({
-      where: { user_ip: clientIp },
-      data: { game_status },
-    });
-    res.json({ ok: true, gamer });
   } catch (error) {
     next(error);
   }
