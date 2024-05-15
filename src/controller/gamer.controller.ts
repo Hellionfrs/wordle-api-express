@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from "express";
 import prisma from "../db/db";
 
-export const gamerController = async (
+export const createGamerController = async (
   req: Request,
   res: Response,
   next: NextFunction
@@ -33,6 +33,29 @@ export const gamerController = async (
       });
     }
   } catch (error) {
-    next(error)
+    next(error);
+  }
+};
+
+export const updateGameStatusController = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const clientIp = req.clientIp;
+    const { game_status } = req.body;
+    if (!clientIp) {
+      res
+        .status(400)
+        .json({ ok: false, error: "No se pudo obtener la direccion IP" });
+    }
+    const gamer = await prisma.gamer.update({
+      where: { user_ip: clientIp },
+      data: { game_status },
+    });
+    res.json({ ok: true, gamer });
+  } catch (error) {
+    next(error);
   }
 };

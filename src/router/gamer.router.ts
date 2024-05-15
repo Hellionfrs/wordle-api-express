@@ -1,8 +1,12 @@
-import express from "express"
-import { gamerController } from "../controller/gamer.controller"
-import ipMiddleware from "../middlewares/ip.middleware"
+import express from "express";
+import {
+  createGamerController,
+  updateGameStatusController,
+} from "../controller/gamer.controller";
+import ipMiddleware from "../middlewares/ip.middleware";
 
-export const gamerRouter = express.Router()
+export const gamerRouter = express.Router();
 
-gamerRouter.use(ipMiddleware)
-gamerRouter.get("/gamer_status",gamerController)
+gamerRouter.use(ipMiddleware);
+gamerRouter.get("/create_gamer", createGamerController);
+gamerRouter.patch("update_game_status", updateGameStatusController);
