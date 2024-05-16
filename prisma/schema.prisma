@@ -19,3 +19,10 @@ model Gamer {
   user_ip String @unique
   game_status Boolean
 }
+
+model DailyWord {
+  id        Int      @id @default(autoincrement())
+  word      String
+  length    Int
+  createdAt DateTime @default(now())
+}
