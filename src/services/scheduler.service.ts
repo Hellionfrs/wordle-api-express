@@ -4,9 +4,15 @@ import { addDailyWord } from "./word.service";
 
 const scheduleDailyWordUpdate = () => {
   cron.schedule("0 * * * *", async () => {
+    console.log("Cron job started at", new Date().toISOString());
     const lengths = wordLengthRange
     for (const length of lengths) {
-      await addDailyWord(length)
+      try {
+        const word = await addDailyWord(length);
+        console.log(`Added word: ${word.word} with length ${length}`);
+      } catch (error) {
+        console.error(`Failed to add word with length ${length}:`, error);
+      }
     }
   })
 };

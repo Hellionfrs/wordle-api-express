@@ -28,3 +28,37 @@ export const wordController = async (
     next(error);
   }
 };
+
+export const verifyCronController = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const { length } = req.query;
+
+    if (!wordLengthRange.includes(Number(length))) {
+      res.status(400).json({
+        ok: false,
+        error: `Invalid length query parameter. Must be between ${
+          wordLengthRange[0]
+        } and ${wordLengthRange[wordLengthRange.length - 1]}.`,
+      });
+    }
+
+    const dailyWord = await getDailyWord(Number(length));
+    if (!dailyWord) {
+      res
+        .status(404)
+        .json({ ok: false, error: "No word found for the specified length." });
+    } else {
+      res.json({
+        ok: true,
+        word: dailyWord.word,
+        createdAt: dailyWord.createdAt,
+      });
+    }
+  } catch (error) {
+    next(error);
+  }
+};
