@@ -1,12 +1,12 @@
 import prisma from "../db/db";
-const randomWords = require('random-words');
 
-const getWordByLength = (length: number): string => {
-  return randomWords({ minLength: length, maxLength: length });
+export const getWordByLength = async (length: number): Promise<string> => {
+  const randomWords = await import('random-words');
+  return randomWords.generate({ exactly: 1, minLength: length, maxLength: length })[0];
 };
 
 export const addDailyWord = async (length: number) => {
-  const word = getWordByLength(length);
+  const word = await getWordByLength(length);
   return prisma.dailyWord.create({
     data: {
       word,

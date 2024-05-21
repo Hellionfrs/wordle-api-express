@@ -1,12 +1,25 @@
 import prisma from "./db";
-import { trialDictionary, wordLengthRange } from "../utils/dictionary.utils";
+import { wordLengthRange } from "../utils/dictionary.utils";
+import { getWordByLength } from "../services/word.service";
+
+const generateWords = async (range: number[]): Promise<string[]> => {
+  const words: string[] = [];
+  for (const len of range) {
+    const word = await getWordByLength(len);
+    words.push(word);
+  }
+  return words;
+};
 
 const seedDatabase = async () => {
   try {
     console.log("Seeding database...");
 
     for (const length of wordLengthRange) {
-      const filteredWords = trialDictionary.filter(word => word.length === length);
+      const generatedWords = await generateWords(wordLengthRange);
+      const filteredWords = generatedWords.filter(
+        (word) => word.length === length
+      );
 
       if (filteredWords.length > 0) {
         for (const word of filteredWords) {
