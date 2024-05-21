@@ -1,19 +1,12 @@
 import prisma from "../db/db";
-import { trialDictionary } from "../utils/dictionary.utils";
+const randomWords = require('random-words');
 
-export const generateWord = (length: number): string => {
-  const filteredWords = trialDictionary.filter(
-    (word) => word.length === length
-  );
-  if (filteredWords.length === 0) {
-    throw new Error(`No words found with length ${length}`);
-  }
-  const randomIndex = Math.floor(Math.random() * filteredWords.length);
-  return filteredWords[randomIndex];
+const getWordByLength = (length: number): string => {
+  return randomWords({ minLength: length, maxLength: length });
 };
 
 export const addDailyWord = async (length: number) => {
-  const word = generateWord(length);
+  const word = getWordByLength(length);
   return prisma.dailyWord.create({
     data: {
       word,
@@ -25,6 +18,6 @@ export const addDailyWord = async (length: number) => {
 export const getDailyWord = async (length: number) => {
   return prisma.dailyWord.findFirst({
     where: { length },
-    orderBy: { createdAt: 'desc' },
+    orderBy: { createdAt: "desc" },
   });
 };
